@@ -1,0 +1,116 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+    <title>Phaser - Making your first game, part 9</title>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+
+function preload() {
+
+    game.load.image('background','assets/VirtualWorld.png');
+    game.load.spritesheet('player', 'assets/Mira.png', 32, 63);
+    
+
+}
+
+var player;
+var cursors;
+
+function create() {
+
+    game.add.tileSprite(0, 0, 1920, 1920, 'background');
+
+    game.world.setBounds(0, 0, 1920, 1920);
+
+    game.physics.startSystem(Phaser.Physics.P2JS);
+
+    player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
+
+    game.physics.p2.enable(player);
+    
+    //  Our animations
+    player.animations.add('left', [3, 4, 5], 12, true);
+    player.animations.add('right', [6, 7, 8], 12, true);
+    player.animations.add('up', [9, 10, 11], 12, true);
+    player.animations.add('down', [0, 1, 2], 12, true);
+
+
+    cursors = game.input.keyboard.createCursorKeys();
+
+    game.camera.follow(player);
+    
+    //set base tile
+    player.frame = 1;
+
+
+}
+
+function update() {
+
+    player.body.setZeroVelocity();
+
+    if (game.input.activePointer.isDown)
+    {
+        //  400 is the speed it will move towards the mouse
+        game.physics.arcade.moveToPointer(player, 300);
+
+        //  if it's overlapping the mouse, don't move any more
+        if (Phaser.Rectangle.contains(player.body, game.input.x, game.input.y))
+        {
+            player.body.velocity.setTo(0, 0);
+        }
+    }
+    else if (cursors.up.isDown)
+    {
+        player.body.velocity.y = -300;
+        player.animations.play('up');
+    }
+    else if (cursors.down.isDown)
+    {
+        player.body.velocity.y = 300;
+        player.animations.play('down');
+    }
+
+    else if (cursors.left.isDown)
+    {
+        player.body.velocity.x = -300;
+        player.animations.play('left');
+    }
+    else if (cursors.right.isDown)
+    {
+        player.body.velocity.x = 300;
+        player.animations.play('right');
+    }
+    else
+    {
+        //  Stand still
+        player.animations.stop();
+
+    }
+
+}
+
+function render() {
+
+    game.debug.cameraInfo(game.camera, 32, 32);
+    game.debug.spriteCoords(player, 32, 500);
+
+}
+
+
+</script>
+
+</body>
+</html>
